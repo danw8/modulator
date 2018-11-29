@@ -22,7 +22,7 @@ pub struct Wave {
     pub amplitude: f32,
     pub frequency: f32,
 
-    pub wave: Box<Fn(&Wave, f32) -> f32>, // wave closure, receives self and time in s
+    pub wave: Box<Fn(&Wave, f32) -> f32 + Send + Sync> , // wave closure, receives self and time in s
 
     pub time: u64,  // accumulated microseconds
     pub value: f32, // current value
@@ -47,13 +47,13 @@ impl Wave {
     }
 
     /// Builder: set the wave calculation closure
-    pub fn wave(mut self, wave: Box<Fn(&Wave, f32) -> f32>) -> Self {
+    pub fn wave(mut self, wave: Box<Fn(&Wave, f32) -> f32 + Send + Sync> ) -> Self {
         self.wave = wave;
         self
     }
 
     /// Builder: set the wave calculation closure
-    pub fn set_wave(&mut self, wave: Box<Fn(&Wave, f32) -> f32>) {
+    pub fn set_wave(&mut self, wave: Box<Fn(&Wave, f32) -> f32 + Send + Sync>) {
         self.wave = wave;
     }
 }

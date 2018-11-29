@@ -412,7 +412,7 @@ pub trait Modulator<T> {
 /// A host for modulators, homogeneous in type T for the value of its modulators
 #[derive(Default)]
 pub struct ModulatorEnv<T> {
-    mods: HashMap<String, Box<dyn Modulator<T>>>, // live modulators
+    mods: HashMap<String, Box<dyn Modulator<T> + Send + Sync>>, // live modulators
 }
 
 impl<T: Default> ModulatorEnv<T> {
@@ -424,7 +424,7 @@ impl<T: Default> ModulatorEnv<T> {
     }
 
     /// Given a unique key for the modulator, take ownership and hash it into mods table
-    pub fn take(&mut self, key: &str, modulator: Box<dyn Modulator<T>>) {
+    pub fn take(&mut self, key: &str, modulator: Box<dyn Modulator<T> + Send + Sync>) {
         self.mods.insert(key.to_string(), modulator);
     }
     /// Remove the modulator with given key, let it die
@@ -433,16 +433,16 @@ impl<T: Default> ModulatorEnv<T> {
     }
 
     /// Take an immutable reference to the mods table
-    pub fn get_mods(&self) -> &HashMap<String, Box<dyn Modulator<T>>> {
+    pub fn get_mods(&self) -> &HashMap<String, Box<dyn Modulator<T> + Send + Sync>> {
         &self.mods
     }
 
     /// Try to fetch an immutable reference to the modulator with the given  key
-    pub fn get(&self, key: &str) -> Option<&Box<dyn Modulator<T>>> {
+    pub fn get(&self, key: &str) -> Option<&Box<dyn Modulator<T> + Send + Sync>> {
         self.mods.get(key)
     }
     /// Try to fetch an mutable reference to the modulator with the given  key
-    pub fn get_mut(&mut self, key: &str) -> Option<&mut Box<dyn Modulator<T>>> {
+    pub fn get_mut(&mut self, key: &str) -> Option<&mut Box<dyn Modulator<T> + Send + Sync>> {
         self.mods.get_mut(key)
     }
 
